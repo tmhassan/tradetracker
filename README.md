@@ -55,5 +55,5 @@ TradeNote is a comprehensive trade tracking web application built with Flask and
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/tradenote.git
+   git clone https://github.com/yourusername/tradetracker.git
    cd tradenote
