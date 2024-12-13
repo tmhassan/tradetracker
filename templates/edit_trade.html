@@ -1,0 +1,140 @@
+<!-- templates/edit_trade.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Trade - {{ account.name }}</title>
+    <!-- Include Bootstrap CSS and other necessary libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include any additional CSS or JS here -->
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>IbnHindi</h2>
+        <a href="{{ url_for('index') }}">Dashboard</a>
+        {% if cycle %}
+            <a href="{{ url_for('cycle_review', cycle_id=cycle.id) }}">Cycle Review</a>
+        {% else %}
+            <a href="#" class="disabled">Cycle Review</a>
+        {% endif %}
+        <a href="{{ url_for('achievements', account_id=account.id) }}">Achievements</a>
+        <a href="{{ url_for('view_trades', account_id=account.id) }}">View Trades</a>
+        <a href="{{ url_for('add_trade', account_id=account.id) }}">Add Trade</a>
+        <a href="{{ url_for('diary', account_id=account.id) }}">Diary</a>
+        <!-- Add more sidebar links as needed -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1>Edit Trade for {{ account.name }}</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="cycle_id" class="form-label">Cycle</label>
+                <select class="form-select" id="cycle_id" name="cycle_id" required>
+                    <option value="" disabled>Select Cycle</option>
+                    {% for cyc in cycles %}
+                        <option value="{{ cyc.id }}" {% if cyc.id == trade.cycle_id %}selected{% endif %}>{{ cyc.start_date.strftime('%b %d, %Y') }} - {{ cyc.end_date.strftime('%b %d, %Y') if cyc.end_date else 'Ongoing' }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="trade_day_id" class="form-label">Trade Day</label>
+                <select class="form-select" id="trade_day_id" name="trade_day_id" required>
+                    <option value="" disabled>Select Trade Day</option>
+                    {% for day in trade_days %}
+                        <option value="{{ day.id }}" {% if day.id == trade.trade_day_id %}selected{% endif %}>{{ day.date.strftime('%b %d, %Y') }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="trade_date" class="form-label">Trade Date</label>
+                <input type="date" class="form-control" id="trade_date" name="trade_date" value="{{ trade.date }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="position" class="form-label">Position</label>
+                <select class="form-select" id="position" name="position" required>
+                    <option value="" disabled>Select Position</option>
+                    <option value="Long" {% if trade.position == 'Long' %}selected{% endif %}>Long</option>
+                    <option value="Short" {% if trade.position == 'Short' %}selected{% endif %}>Short</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="entry_price" class="form-label">Entry Price</label>
+                <input type="number" step="0.01" class="form-control" id="entry_price" name="entry_price" value="{{ trade.entry_price }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="exit_price" class="form-label">Exit Price</label>
+                <input type="number" step="0.01" class="form-control" id="exit_price" name="exit_price" value="{{ trade.exit_price }}">
+            </div>
+            <div class="mb-3">
+                <label for="profit_loss" class="form-label">Profit/Loss</label>
+                <input type="number" step="0.01" class="form-control" id="profit_loss" name="profit_loss" value="{{ trade.profit_loss }}">
+            </div>
+            <div class="mb-3">
+                <label for="pattern" class="form-label">Pattern</label>
+                <input type="text" class="form-control" id="pattern" name="pattern" value="{{ trade.pattern }}" placeholder="Enter pattern">
+            </div>
+            <div class="mb-3">
+                <label for="mistake" class="form-label">Mistake</label>
+                <input type="text" class="form-control" id="mistake" name="mistake" value="{{ trade.mistake }}" placeholder="Enter mistake">
+            </div>
+            <div class="mb-3">
+                <label for="satisfaction" class="form-label">Satisfaction</label>
+                <select class="form-select" id="satisfaction" name="satisfaction">
+                    <option value="" disabled>Select Satisfaction</option>
+                    <option value="Good" {% if trade.satisfaction == 'Good' %}selected{% endif %}>Good</option>
+                    <option value="Bad" {% if trade.satisfaction == 'Bad' %}selected{% endif %}>Bad</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="tags" class="form-label">Tags</label>
+                <select multiple class="form-select" id="tags" name="tags">
+                    {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if tag in trade.tags %}selected{% endif %}>{{ tag.name }}{% if tag.group %} ({{ tag.group.name }}){% endif %}</option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">Hold down the Ctrl (Windows) or Command (Mac) button to select multiple options.</small>
+            </div>
+            <div class="mb-3">
+                <label for="screenshots" class="form-label">Add Screenshots</label>
+                <input class="form-control" type="file" id="screenshots" name="screenshots" multiple>
+                <small class="form-text text-muted">Upload additional chart screenshots related to this trade.</small>
+            </div>
+            <button type="submit" class="btn btn-warning">Update Trade</button>
+            <a href="{{ url_for('view_trades', account_id=account.id) }}" class="btn btn-secondary">Cancel</a>
+        </form>
+
+        <!-- Existing Screenshots -->
+        <h3 class="mt-4">Existing Screenshots</h3>
+        <div class="row">
+            {% for screenshot in trade.screenshots %}
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <img src="{{ url_for('uploaded_file', filename=screenshot.filename) }}" class="card-img-top" alt="Screenshot">
+                        <div class="card-body">
+                            <p class="card-text">{{ screenshot.annotation }}</p>
+                            <!-- Optionally, add edit/delete annotation functionality -->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

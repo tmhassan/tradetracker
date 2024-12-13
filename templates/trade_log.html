@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Log - {{ trade_record.trade_day.date.strftime('%b %d, %Y') }}</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Theme Styles */
+        body.light-theme {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        body.light-theme .sidebar {
+            background-color: #ffffff;
+        }
+        body.light-theme .sidebar h2,
+        body.light-theme .sidebar a {
+            color: #212529;
+        }
+        body.light-theme .main {
+            background-color: #ffffff;
+        }
+        body.light-theme .card {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        body.light-theme .btn {
+            background-color: #4fc3f7;
+            color: #121212;
+        }
+        body.light-theme .btn:hover {
+            background-color: #29b8f0;
+        }
+        body.light-theme .form-control {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #ced4da;
+        }
+        body.light-theme .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        body.light-theme .table-responsive {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        body.light-theme .table-responsive th {
+            background-color: #dee2e6;
+            color: #212529;
+        }
+        body.light-theme .table-responsive td {
+            background-color: #ffffff;
+            color: #212529;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 220px;
+            background-color: #1f1f1f;
+            min-height: 100vh;
+            position: fixed;
+            padding-top: 30px;
+            transition: width 0.3s;
+        }
+        .sidebar h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+        .sidebar a {
+            color: #b3b3b3;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.3s, color 0.3s;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .sidebar a:hover {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        /* Main Content Styles */
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #121212;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1.8rem;
+        }
+        .account-select {
+            display: flex;
+            align-items: center;
+        }
+        .account-select select {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        body.light-theme .account-select select {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        .account-select select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4fc3f7;
+        }
+        .account-select button {
+            background-color: #4fc3f7;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .account-select button:hover {
+            background-color: #29b8f0;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        .theme-toggle input {
+            margin-right: 10px;
+        }
+
+        /* Form Styles */
+        .form-section {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        }
+        .light-theme .form-section {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .form-section:hover {
+            transform: translateY(-5px);
+        }
+        .form-section h3 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .light-theme .form-section h3 {
+            color: #212529;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>IbnHindi</h2>
+        <a href="/">Dashboard</a>
+        <a href="/cycle_review/{{ cycle.id }}">Cycle Review</a>
+        <a href="/achievements/{{ trade_record.account.id }}">Achievements</a>
+        <!-- Add more sidebar links as needed -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'warning' if category == 'warning' else 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Header -->
+        <header>
+            <h1>Trade Log - {{ trade_record.trade_day.date.strftime('%b %d, %Y') }}</h1>
+            <div class="account-select">
+                <form method="GET" action="{{ url_for('index') }}">
+                    <select id="accountSelect" name="selected_account" onchange="this.form.submit()">
+                        {% for account in accounts %}
+                            <option value="{{ account.name }}" {% if selected_account and account.name == selected_account.name %}selected{% endif %}>{{ account.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <button id="refreshBtn" class="btn btn-primary">Refresh</button>
+                <div class="theme-toggle">
+                    <input type="checkbox" id="themeSwitch">
+                    <label for="themeSwitch">Light Mode</label>
+                </div>
+            </div>
+        </header>
+
+        <!-- Trade Log Form -->
+        <div class="form-section">
+            <h3>Log Trade for {{ trade_record.trade_day.date.strftime('%b %d, %Y') }}</h3>
+            <form method="POST">
+                <!-- Hidden field to identify the trade record -->
+                <input type="hidden" name="trade_record_id" value="{{ trade_record.id }}">
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Enter your notes here...">{{ trade_log.notes if trade_log else '' }}</textarea>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="win" name="win" {% if trade_log and trade_log.win %}checked{% endif %}>
+                    <label class="form-check-label" for="win">Win</label>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="loss" name="loss" {% if trade_log and trade_log.loss %}checked{% endif %}>
+                    <label class="form-check-label" for="loss">Loss</label>
+                </div>
+                <button type="submit" class="btn btn-success">Save Log</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Dashboard</a>
+            </form>
+        </div>
+
+        <!-- Journal Entry Display -->
+        {% if trade_log and trade_log.journal_entry %}
+            <div class="form-section">
+                <h3>Journal Entry</h3>
+                <pre>{{ trade_log.journal_entry }}</pre>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Additional JS for Theme Toggle and Refresh -->
+    <script>
+        const accountSelect = document.getElementById("accountSelect");
+        const refreshBtn = document.getElementById("refreshBtn");
+
+        /**
+         * Update the dashboard by fetching new data and rendering metrics and charts.
+         */
+        async function updateDashboard() {
+            // Implement any necessary dashboard updates if needed
+            // Since this is the Trade Log page, most actions are form-based
+        }
+
+        // Initial Dashboard Load
+        // Not necessary for Trade Log page
+
+        // Event Listeners
+        refreshBtn.addEventListener("click", () => {
+            location.reload();
+        });
+
+        // Theme Toggle Logic
+        const themeSwitch = document.getElementById("themeSwitch");
+        const currentTheme = localStorage.getItem("theme") || "dark";
+
+        if (currentTheme === "light") {
+            document.body.classList.add("light-theme");
+            themeSwitch.checked = true;
+        } else {
+            document.body.classList.remove("light-theme");
+            themeSwitch.checked = false;
+        }
+
+        themeSwitch.addEventListener("change", () => {
+            if (themeSwitch.checked) {
+                document.body.classList.add("light-theme");
+                localStorage.setItem("theme", "light");
+            } else {
+                document.body.classList.remove("light-theme");
+                localStorage.setItem("theme", "dark");
+            }
+        });
+    </script>
+</body>
+</html>

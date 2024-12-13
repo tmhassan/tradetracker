@@ -1,0 +1,378 @@
+<!-- templates/view_trades.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Trades - {{ account.name }}</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Theme Styles */
+        body.light-theme {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        body.light-theme .sidebar {
+            background-color: #ffffff;
+        }
+        body.light-theme .sidebar h2,
+        body.light-theme .sidebar a {
+            color: #212529;
+        }
+        body.light-theme .main {
+            background-color: #ffffff;
+        }
+        body.light-theme .card {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        body.light-theme .btn {
+            background-color: #4fc3f7;
+            color: #121212;
+        }
+        body.light-theme .btn:hover {
+            background-color: #29b8f0;
+        }
+        body.light-theme .form-control {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #ced4da;
+        }
+        body.light-theme .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        body.light-theme .table-responsive {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        body.light-theme .table-responsive th {
+            background-color: #dee2e6;
+            color: #212529;
+        }
+        body.light-theme .table-responsive td {
+            background-color: #ffffff;
+            color: #212529;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 220px;
+            background-color: #1f1f1f;
+            min-height: 100vh;
+            position: fixed;
+            padding-top: 30px;
+            transition: width 0.3s;
+        }
+        .sidebar h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+        .sidebar a {
+            color: #b3b3b3;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.3s, color 0.3s;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .sidebar a:hover {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        /* Main Content Styles */
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #121212;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1.8rem;
+        }
+        .account-select {
+            display: flex;
+            align-items: center;
+        }
+        .account-select select {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        body.light-theme .account-select select {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        .account-select select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4fc3f7;
+        }
+        .account-select button {
+            background-color: #4fc3f7;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .account-select button:hover {
+            background-color: #29b8f0;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        .theme-toggle input {
+            margin-right: 10px;
+        }
+
+        /* Form Styles */
+        .form-section {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        }
+        .light-theme .form-section {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .form-section:hover {
+            transform: translateY(-5px);
+        }
+        .form-section h3 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .light-theme .form-section h3 {
+            color: #212529;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>IbnHindi</h2>
+        <a href="{{ url_for('index') }}">Dashboard</a>
+        {% if cycle %}
+            <a href="{{ url_for('cycle_review', cycle_id=cycle.id) }}">Cycle Review</a>
+        {% else %}
+            <a href="#" class="disabled">Cycle Review</a>
+        {% endif %}
+        <a href="{{ url_for('achievements', account_id=account.id) }}">Achievements</a>
+        <a href="{{ url_for('view_trades', account_id=account.id) }}">View Trades</a>
+        <a href="{{ url_for('add_trade', account_id=account.id) }}">Add Trade</a>
+        <a href="{{ url_for('diary', account_id=account.id) }}">Diary</a>
+        <!-- Add more sidebar links as needed -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main container-fluid">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h1>Trades for {{ account.name }}</h1>
+
+        <!-- Filtering Options -->
+        <form method="GET" action="{{ url_for('view_trades', account_id=account.id) }}" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label for="filter_date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="filter_date" name="filter_date" value="{{ filter_date }}">
+            </div>
+            <div class="col-md-2">
+                <label for="filter_position" class="form-label">Position</label>
+                <select class="form-select" id="filter_position" name="filter_position">
+                    <option value="">All</option>
+                    <option value="Long" {% if filter_position == 'Long' %}selected{% endif %}>Long</option>
+                    <option value="Short" {% if filter_position == 'Short' %}selected{% endif %}>Short</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filter_satisfaction" class="form-label">Satisfaction</label>
+                <select class="form-select" id="filter_satisfaction" name="filter_satisfaction">
+                    <option value="">All</option>
+                    <option value="Good" {% if filter_satisfaction == 'Good' %}selected{% endif %}>Good</option>
+                    <option value="Bad" {% if filter_satisfaction == 'Bad' %}selected{% endif %}>Bad</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filter_tags" class="form-label">Tags</label>
+                <select multiple class="form-select" id="filter_tags" name="filter_tags">
+                    {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if tag.id|string in filter_tags %}selected{% endif %}>{{ tag.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">Hold down the Ctrl (Windows) or Command (Mac) button to select multiple options.</small>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+
+        <!-- Trades Table -->
+        <div class="table-responsive">
+            <table id="tradesTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Cycle</th>
+                        <th>Trade Day</th>
+                        <th>Position</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>Profit/Loss</th>
+                        <th>Pattern</th>
+                        <th>Mistake</th>
+                        <th>Satisfaction</th>
+                        <th>Tags</th>
+                        <th>Screenshots</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in trades %}
+                        <tr>
+                            <td>{{ trade.date.strftime('%b %d, %Y') }}</td>
+                            <td>{{ trade.cycle.id }}</td>
+                            <td>{{ trade.trade_day.date.strftime('%b %d, %Y') }}</td>
+                            <td>{{ trade.position }}</td>
+                            <td>${{ "{:.2f}".format(trade.entry_price) }}</td>
+                            <td>
+                                {% if trade.exit_price %}
+                                    ${{ "{:.2f}".format(trade.exit_price) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if trade.profit_loss %}
+                                    ${{ "{:.2f}".format(trade.profit_loss) }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ trade.pattern }}</td>
+                            <td>{{ trade.mistake }}</td>
+                            <td>{{ trade.satisfaction }}</td>
+                            <td>
+                                {% for tag in trade.tags %}
+                                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for screenshot in trade.screenshots %}
+                                    <a href="{{ url_for('uploaded_file', filename=screenshot.filename) }}" target="_blank">
+                                        <img src="{{ url_for('uploaded_file', filename=screenshot.filename) }}" alt="Screenshot" width="50">
+                                    </a>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_trade', trade_id=trade.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ url_for('delete_trade', trade_id=trade.id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this trade?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Trade Button -->
+        <a href="{{ url_for('add_trade', account_id=account.id) }}" class="btn btn-primary mt-3">Add New Trade</a>
+    </div>
+
+    <!-- Include Bootstrap JS and DataTables JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery (required for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <!-- Include DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Initialize DataTables -->
+    <script>
+        $(document).ready(function() {
+            $('#tradesTable').DataTable({
+                "order": [[0, "desc"]],  // Order by Date descending
+                "paging": true,
+                "searching": true,
+                "info": true
+            });
+        });
+    </script>
+</body>
+</html>

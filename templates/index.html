@@ -1,0 +1,1463 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Tracker Dashboard</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Theme Styles */
+        body.light-theme {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        body.light-theme .sidebar {
+            background-color: #ffffff;
+        }
+        body.light-theme .sidebar h2,
+        body.light-theme .sidebar a {
+            color: #212529;
+        }
+        body.light-theme .main {
+            background-color: #ffffff;
+        }
+        body.light-theme .card {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        body.light-theme .progress {
+            background-color: #e0e0e0;
+        }
+        body.light-theme .progress-bar {
+            background-color: #4caf50;
+        }
+        body.light-theme .btn {
+            background-color: #4fc3f7;
+            color: #121212;
+        }
+        body.light-theme .btn:hover {
+            background-color: #29b8f0;
+        }
+        body.light-theme .form-control {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #ced4da;
+        }
+        body.light-theme .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        body.light-theme .table-responsive {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        body.light-theme .table-responsive th {
+            background-color: #dee2e6;
+            color: #212529;
+        }
+        body.light-theme .table-responsive td {
+            background-color: #ffffff;
+            color: #212529;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 220px;
+            background-color: #1f1f1f;
+            min-height: 100vh;
+            position: fixed;
+            padding-top: 30px;
+            transition: width 0.3s;
+        }
+        .sidebar h2 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+        .sidebar a {
+            color: #b3b3b3;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            font-size: 1rem;
+            transition: background 0.3s, color 0.3s;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .sidebar a:hover {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        /* Main Content Styles */
+        .main {
+            margin-left: 220px;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #121212;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 1.8rem;
+        }
+        .account-select {
+            display: flex;
+            align-items: center;
+        }
+        .account-select select {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        body.light-theme .account-select select {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        .account-select select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4fc3f7;
+        }
+        .account-select button {
+            background-color: #4fc3f7;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .account-select button:hover {
+            background-color: #29b8f0;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        .theme-toggle input {
+            margin-right: 10px;
+        }
+
+        /* Metrics Styles */
+        .metrics .card {
+            background-color: #1f1f1f;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        }
+        .light-theme .metrics .card {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .metrics .card:hover {
+            transform: translateY(-5px);
+        }
+        .metrics .card h5 {
+            color: #b3b3b3;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .light-theme .metrics .card h5 {
+            color: #6c757d;
+        }
+        .metrics .card .card-body h3 {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .light-theme .metrics .card .card-body h3 {
+            color: #212529;
+        }
+
+        /* Chart Container Styles */
+        .chart-container {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .light-theme .chart-container {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .chart-container h2 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        .light-theme .chart-container h2 {
+            color: #212529;
+        }
+
+        /* Form Section Styles */
+        .form-section {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        }
+        .light-theme .form-section {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .form-section:hover {
+            transform: translateY(-5px);
+        }
+        .form-section h3 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .light-theme .form-section h3 {
+            color: #212529;
+        }
+        .form-section .input-group .form-control {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-size: 1rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .light-theme .form-section .input-group .form-control {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #ced4da;
+        }
+        .form-section .input-group .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4fc3f7;
+        }
+        .form-section .input-group .btn {
+            background-color: #4fc3f7;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .form-section .input-group .btn:hover {
+            background-color: #29b8f0;
+        }
+
+        /* Trade Records Table Styles */
+        .table-responsive {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+        }
+        .light-theme .table-responsive {
+            background-color: #f0f0f0;
+            color: #212529;
+        }
+        .table-responsive:hover {
+            transform: translateY(-5px);
+        }
+        .table-responsive h3 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .light-theme .table-responsive h3 {
+            color: #212529;
+        }
+        .table-responsive table {
+            color: #e0e0e0;
+        }
+        .light-theme .table-responsive table {
+            color: #212529;
+        }
+        .table-responsive th {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .light-theme .table-responsive th {
+            background-color: #dee2e6;
+            color: #212529;
+        }
+        .table-responsive td {
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            vertical-align: middle;
+        }
+        .light-theme .table-responsive td {
+            background-color: #ffffff;
+            color: #212529;
+        }
+        .table-responsive tr:nth-child(even) td {
+            background-color: #2a2a2a;
+        }
+        .light-theme .table-responsive tr:nth-child(even) td {
+            background-color: #f8f9fa;
+        }
+        .table-responsive tr:hover td {
+            background-color: #333333;
+        }
+        .light-theme .table-responsive tr:hover td {
+            background-color: #e9ecef;
+        }
+        .table-responsive .btn-success {
+            background-color: #4fc3f7;
+            border: none;
+            color: #121212;
+            transition: background-color 0.3s;
+        }
+        .table-responsive .btn-success:hover {
+            background-color: #29b8f0;
+        }
+        .table-responsive .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        .table-responsive .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Progress Bar Styles */
+        .progress {
+            height: 20px;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .light-theme .progress {
+            background-color: #e0e0e0;
+        }
+        .progress-bar {
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>IbnHindi</h2>
+        <a href="/">Dashboard</a>
+        <a href="/cycle_review/{{ current_cycle.id if current_cycle else '#' }}">Cycle Review</a>
+        <a href="/achievements/{{ selected_account.id if selected_account else '#' }}">Achievements</a>
+        <a href="{{ url_for('view_trades', account_id=account.id) }}">View Trades</a>
+        <a href="{{ url_for('add_trade', account_id=account.id) }}">Add Trade</a>
+        <a href="{{ url_for('diary', account_id=account.id) }}">Diary</a>
+        <!-- Add more sidebar links as needed -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if message == "cycle_completed" and category == "info" %}
+                        <script>
+                            celebrateCycleCompletion();
+                        </script>
+                    {% endif %}
+                    <div class="alert alert-{{ 'warning' if category == 'warning' else 'success' if category == 'success' else 'danger' if category == 'danger' else 'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Header -->
+        <header>
+            <h1>Trade Tracker Dashboard</h1>
+            <div class="account-select">
+                <form method="GET" action="{{ url_for('index') }}">
+                    <select id="accountSelect" name="selected_account" onchange="this.form.submit()">
+                        {% for account in accounts %}
+                            <option value="{{ account.name }}" {% if selected_account and account.name == selected_account.name %}selected{% endif %}>{{ account.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <button id="refreshBtn" class="btn btn-primary">Refresh</button>
+                <div class="theme-toggle">
+                    <input type="checkbox" id="themeSwitch">
+                    <label for="themeSwitch">Light Mode</label>
+                </div>
+            </div>
+        </header>
+
+        <!-- Metrics -->
+        <div class="row metrics">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Total Profit</h5>
+                        <h3 id="totalProfit">${{ total_profit | float | round(2) }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Win Rate</h5>
+                        <h3 id="winRate">{{ win_rate | float | round(1) }}%</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Average Profit</h5>
+                        <h3 id="avgProfit">${{ avg_profit | float | round(2) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Cards -->
+        <div class="row">
+            {% for account in accounts %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ account.name }}</h5>
+                            <p class="card-text">
+                                <strong>NY Target:</strong> ${{ "{:.2f}".format(account.target_ny_amount) }}<br>
+                                <strong>London Target:</strong> ${{ "{:.2f}".format(account.target_london_amount) }}
+                            </p>
+                            <!-- Progress Bars -->
+                            <p class="card-text"><strong>NY Trade Progress:</strong></p>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="nyProgress-{{ account.id }}">0%</div>
+                            </div>
+                            <p class="card-text"><strong>London Trade Progress:</strong></p>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="londonProgress-{{ account.id }}">0%</div>
+                            </div>
+                            <p class="card-text"><strong>Total Profit:</strong> <span id="totalProfit-{{ account.id }}">0.00</span></p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Trade Goals with Progress Bars -->
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Trade Goals</h3>
+                <div class="mb-3">
+                    <label class="form-label">NY Trade (${{ "{:.2f}".format(selected_account.target_ny_amount) if selected_account else '0.00' }})</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="nyProgressBar">0%</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">London Trade (${{ "{:.2f}".format(selected_account.target_london_amount) if selected_account else '0.00' }})</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="londonProgressBar">0%</div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Profit (${{ "{:.2f}".format(selected_account.target_ny_amount + selected_account.target_london_amount) if selected_account else '0.00' }})</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="totalProgressBar">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-container">
+            <h2>Cumulative P&L and Daily Profits</h2>
+            <canvas id="pnlChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Trade Completion Rates</h2>
+            <canvas id="completionChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>Profit/Loss Over Cycles</h2>
+            <canvas id="profitLossChart"></canvas>
+        </div>
+
+        <!-- Forms: Add Account, Add Trade Day, Export Data -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-section">
+                    <h3>Add New Account</h3>
+                    <form method="POST">
+                        <input type="hidden" name="add_account" value="1">
+                        <div class="input-group mb-3">
+                            <input type="text" name="new_account_name" class="form-control" placeholder="Account Name" required>
+                            <input type="number" step="0.01" name="target_ny" class="form-control" placeholder="NY Target ($)" value="360.00" required>
+                            <input type="number" step="0.01" name="target_london" class="form-control" placeholder="London Target ($)" value="200.00" required>
+                            <button class="btn btn-primary" type="submit">Add Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-section">
+                    <h3>Add New Trade Day</h3>
+                    <form method="POST">
+                        <input type="hidden" name="add_trade_day" value="1">
+                        <div class="input-group mb-3">
+                            <input type="date" name="new_trade_date" class="form-control" required>
+                            <button class="btn btn-primary" type="submit">Add Trade Day</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-section">
+                    <h3>Export Data</h3>
+                    <form method="POST">
+                        <input type="hidden" name="export_csv" value="1">
+                        <div class="input-group mb-3">
+                            <select name="selected_account" class="form-select" required>
+                                {% for account in accounts %}
+                                    <option value="{{ account.name }}">{{ account.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-primary" type="submit">Export as CSV</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Cycle Information -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Current Cycle</h3>
+                        {% if current_cycle %}
+                            <p><strong>Start Date:</strong> {{ current_cycle.start_date.strftime('%b %d, %Y') }}</p>
+                            <p><strong>End Date:</strong> {{ current_cycle.end_date.strftime('%b %d, %Y') }}</p>
+                            <p><strong>Payout Taken:</strong> {{ 'Yes' if current_cycle.payout_taken else 'No' }}</p>
+                            {% if not current_cycle.payout_taken %}
+                                <form method="POST" action="{{ url_for('take_payout', cycle_id=current_cycle.id) }}">
+                                    <button type="submit" class="btn btn-warning">Take Payout</button>
+                                </form>
+                            {% else %}
+                                <span class="badge bg-success">Payout Taken</span>
+                            {% endif %}
+                        {% else %}
+                            <p>No active cycle found.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade Records Table -->
+        <div class="table-responsive">
+            <h3>Trade Records for {{ selected_account.name if selected_account else 'N/A' }}</h3>
+            <form method="POST" id="tradeForm">
+                <!-- Hidden input to identify which account's records are being updated -->
+                <input type="hidden" name="account_name" value="{{ selected_account.name if selected_account else '' }}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>NY Profit ($)</th>
+                            <th>London Profit ($)</th>
+                            <th>Daily Profit ($)</th>
+                            <th>Payout</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for day in trade_days %}
+                          {% for record in day.trade_records %}
+                              {% if selected_account and record.account_id == selected_account.id %}
+                                  <tr>
+                                      <td>{{ day.date.strftime('%b %d, %Y') }}</td>
+                                      <td>
+                                          <input type="number" step="0.01" name="ny_profit_{{ record.id }}" value="{{ record.ny_profit }}" class="form-control form-control-sm">
+                                      </td>
+                                      <td>
+                                          <input type="number" step="0.01" name="london_profit_{{ record.id }}" value="{{ record.london_profit }}" class="form-control form-control-sm">
+                                      </td>
+                                      <td>
+                                          ${{ "{:.2f}".format(record.daily_profit) }}
+                                      </td>
+                                      <td>
+                                          <input type="checkbox" name="payout_{{ record.id }}" {% if record.payout_taken %}checked{% endif %}>
+                                          {% if record.payout_taken %}
+                                              <i class="bi bi-check-circle-fill text-success"></i>
+                                          {% else %}
+                                              <i class="bi bi-x-circle-fill text-danger"></i>
+                                          {% endif %}
+                                      </td>
+                                      <td>
+                                          <button type="submit" class="btn btn-success btn-sm">Update</button>
+                                          <a href="{{ url_for('trade_log', trade_record_id=record.id) }}" class="btn btn-secondary btn-sm">Log</a>
+                                      </td>
+                                  </tr>
+                              {% endif %}
+                          {% endfor %}
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </form>
+      </div>
+  </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Additional JS for Progress Bars and Animations -->
+    <script>
+        const accountSelect = document.getElementById("accountSelect");
+        const refreshBtn = document.getElementById("refreshBtn");
+        let pnlChart = null;
+        let completionChart = null;
+        let profitLossChart = null;
+
+        /**
+         * Fetch account-specific data and update the dashboard metrics and chart.
+         * @param {string} account - The name of the selected account.
+         */
+        async function fetchAccountData(account) {
+            const response = await fetch(`/account_data/${account}`);
+            if (!response.ok) {
+                console.error("Failed to fetch account data.");
+                return;
+            }
+            const data = await response.json();
+            return data;
+        }
+
+        /**
+         * Update the dashboard metrics with fetched data.
+         * @param {Object} data - The data object containing metrics.
+         */
+        function updateMetrics(data) {
+          document.getElementById("totalProfit").textContent = `$${data.total_profit.toFixed(2)}`;
+          document.getElementById("winRate").textContent = `${data.win_rate.toFixed(1)}%`;
+          document.getElementById("avgProfit").textContent = `$${data.avg_profit.toFixed(2)}`;
+        }
+
+        /**
+         * Render or update the Chart.js chart with new data.
+         * @param {Object} data - The data object containing chart data.
+         */
+        function renderChart(data) {
+            const ctx = document.getElementById("pnlChart").getContext("2d");
+            if (pnlChart) {
+                pnlChart.destroy();
+            }
+
+            pnlChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: data.dates,
+                    datasets: [
+                        {
+                            type: "bar",
+                            label: "NY Daily Profit",
+                            data: data.ny_profits,
+                            backgroundColor: "rgba(75, 192, 192, 0.6)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1,
+                        },
+                        {
+                            type: "bar",
+                            label: "London Daily Profit",
+                            data: data.london_profits,
+                            backgroundColor: "rgba(153, 102, 255, 0.6)",
+                            borderColor: "rgba(153, 102, 255, 1)",
+                            borderWidth: 1,
+                        },
+                        {
+                            type: "line",
+                            label: "Cumulative P&L",
+                            data: cumulative_pnl,
+                            borderColor: "#ff9800",
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 3,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "#e0e0e0",
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#333333',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#4fc3f7',
+                            borderWidth: 1,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: "#e0e0e0",
+                            },
+                            grid: {
+                                color: "#333333",
+                            },
+                        },
+                        y: {
+                            ticks: {
+                                color: "#e0e0e0",
+                            },
+                            grid: {
+                                color: "#333333",
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        /**
+         * Render the Trade Completion Rates Chart.
+         * @param {Object} data - The data object containing trade completions.
+         */
+        function renderCompletionChart(data) {
+            const ctx = document.getElementById("completionChart").getContext("2d");
+            if (completionChart) {
+                completionChart.destroy();
+            }
+
+            completionChart = new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: ["NY Completed", "NY Pending", "London Completed", "London Pending"],
+                    datasets: [{
+                        data: [
+                            data.ny_completed_count,
+                            data.ny_pending_count,
+                            data.london_completed_count,
+                            data.london_pending_count
+                        ],
+                        backgroundColor: [
+                            "#4caf50", // Green
+                            "#ffeb3b", // Yellow
+                            "#2196f3", // Blue
+                            "#f44336"  // Red
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "#e0e0e0",
+                            },
+                        },
+                        tooltip: {
+                            backgroundColor: '#333333',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#4fc3f7',
+                            borderWidth: 1,
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Render the Profit/Loss Over Cycles Chart.
+         * @param {Object} data - The data object containing profit/loss per cycle.
+         */
+        function renderProfitLossChart(data) {
+            const ctx = document.getElementById("profitLossChart").getContext("2d");
+            if (profitLossChart) {
+                profitLossChart.destroy();
+            }
+
+            profitLossChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: data.cycle_dates,
+                    datasets: [{
+                        label: "Total Profit",
+                        data: data.cycle_profits,
+                        borderColor: "#ff9800",
+                        backgroundColor: "rgba(255, 152, 0, 0.2)",
+                        fill: true,
+                        tension: 0.3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "#e0e0e0",
+                            },
+                        },
+                        tooltip: {
+                            backgroundColor: '#333333',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#4fc3f7',
+                            borderWidth: 1,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: "#e0e0e0",
+                            },
+                            grid: {
+                                color: "#333333",
+                            },
+                        },
+                        y: {
+                            ticks: {
+                                color: "#e0e0e0",
+                            },
+                            grid: {
+                                color: "#333333",
+                            },
+                        },
+                    },
+                }
+            });
+        }
+
+        /**
+         * Update account-specific progress bars and stats.
+         * @param {Object} data - The data object containing metrics.
+         * @param {int} account_id - The ID of the account.
+         */
+         function updateAccountCards(accounts_data) {
+             accounts_data.forEach(account => {
+                 // Update Total Profit
+                 document.getElementById(`totalProfit-${account.id}`).textContent = `$${account.total_profit.toFixed(2)}`;
+
+                 // Update NY Trade Progress
+                 let nyProgress = calculateProgress(account.ny_completed_count, account.ny_pending_count);
+                 let nyProgressBar = document.getElementById(`nyProgress-${account.id}`);
+                 nyProgressBar.style.width = `${nyProgress}%`;
+                 nyProgressBar.textContent = `${nyProgress}%`;
+
+                 // Update London Trade Progress
+                 let londonProgress = calculateProgress(account.london_completed_count, account.london_pending_count);
+                 let londonProgressBar = document.getElementById(`londonProgress-${account.id}`);
+                 londonProgressBar.style.width = `${londonProgress}%`;
+                 londonProgressBar.textContent = `${londonProgress}%`;
+             });
+         }
+
+         function calculateProgress(completed, pending) {
+             let total = completed + pending;
+             return total > 0 ? ((completed / total) * 100).toFixed(1) : 0;
+         }
+
+        /**
+         * Render animated confetti when a cycle is completed.
+         */
+        function celebrateCycleCompletion() {
+            // Trigger confetti animation
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            alert("Congratulations! You have completed a cycle and taken your payout.");
+        }
+
+        /**
+         * Update the Trade Goals Progress Bars based on completion data.
+         * @param {Object} data - The data object containing trade completions.
+         */
+        function updateTradeGoalsProgress(data) {
+            // Update NY Trade Progress Bar
+            let nyCompleted = data.ny_completed_count;
+            let nyPending = data.ny_pending_count;
+            let nyTotal = nyCompleted + nyPending;
+            let nyProgress = nyTotal > 0 ? (nyCompleted / nyTotal) * 100 : 0;
+            const nyProgressBar = document.getElementById("nyProgressBar");
+            if (nyProgressBar) {
+                nyProgressBar.style.width = `${nyProgress.toFixed(1)}%`;
+                nyProgressBar.textContent = `${nyProgress.toFixed(1)}%`;
+            }
+
+            // Update London Trade Progress Bar
+            let londonCompleted = data.london_completed_count;
+            let londonPending = data.london_pending_count;
+            let londonTotal = londonCompleted + londonPending;
+            let londonProgress = londonTotal > 0 ? (londonCompleted / londonTotal) * 100 : 0;
+            const londonProgressBar = document.getElementById("londonProgressBar");
+            if (londonProgressBar) {
+                londonProgressBar.style.width = `${londonProgress.toFixed(1)}%`;
+                londonProgressBar.textContent = `${londonProgress.toFixed(1)}%`;
+            }
+
+            // Update Total Profit Progress Bar
+            // Assuming the backend provides target amounts. If not, fetch them as needed.
+            const targetNY = {{ target_ny_amount | tojson | default(0.0) }};
+            const targetLondon = {{ target_london_amount | tojson | default(0.0) }};
+            const totalTarget = targetNY + targetLondon;
+            const totalProfit = data.total_profit;
+            const totalProfitProgress = totalTarget > 0 ? (totalProfit / totalTarget) * 100 : 0;
+
+            const totalProgressBar = document.getElementById("totalProgressBar");
+            if (totalProgressBar) {
+                totalProgressBar.style.width = `${totalProfitProgress.toFixed(1)}%`;
+                totalProgressBar.textContent = `${totalProfitProgress.toFixed(1)}%`;
+            }
+        }
+
+        /**
+         * Fetch all accounts' data for updating individual account progress bars.
+         */
+        async function fetchAllAccountsData() {
+            const response = await fetch(`/all_accounts_data`);
+            if (!response.ok) {
+                console.error("Failed to fetch all accounts data.");
+                return;
+            }
+            const data = await response.json();
+            return data;
+        }
+
+         /**
+          * Update all accounts' progress bars.
+          * @param {Array} accounts_data - List of all accounts' data.
+          */
+         function updateAllAccountsProgressBars(accounts_data) {
+             accounts_data.forEach(account => {
+                 // Update NY Trade Progress
+                 let nyTotal = account.ny_completed_count + account.ny_pending_count;
+                 let nyProgress = nyTotal > 0 ? (account.ny_completed_count / nyTotal) * 100 : 0;
+                 let nyProgressBar = document.getElementById(`nyProgress-${account.id}`);
+                 if (nyProgressBar) {
+                     nyProgressBar.style.width = `${nyProgress.toFixed(1)}%`;
+                     nyProgressBar.textContent = `${nyProgress.toFixed(1)}%`;
+                 }
+
+                 // Update London Trade Progress
+                 let londonTotal = account.london_completed_count + account.london_pending_count;
+                 let londonProgress = londonTotal > 0 ? (account.london_completed_count / londonTotal) * 100 : 0;
+                 let londonProgressBar = document.getElementById(`londonProgress-${account.id}`);
+                 if (londonProgressBar) {
+                     londonProgressBar.style.width = `${londonProgress.toFixed(1)}%`;
+                     londonProgressBar.textContent = `${londonProgress.toFixed(1)}%`;
+                 }
+
+                 // Update Total Profit
+                 let totalProfit = account.total_profit;
+                 let totalProfitSpan = document.getElementById(`totalProfit-${account.id}`);
+                 if (totalProfitSpan) {
+                     totalProfitSpan.textContent = totalProfit.toFixed(2);
+                 }
+             });
+         }
+
+         document.addEventListener("DOMContentLoaded", function() {
+             const accountSelect = document.getElementById("accountSelect");
+             const refreshBtn = document.getElementById("refreshBtn");
+
+             // Initialize Dashboard
+             function initializeDashboard() {
+                 const selectedAccount = accountSelect.value;
+                 if (!selectedAccount) {
+                     console.error("No account selected.");
+                     return;
+                 }
+
+                 // Fetch and update all components
+                 fetchAllAccountsData(selectedAccount);
+                 fetchTradeGoalsData(selectedAccount);
+                 fetchCumulativePNL(selectedAccount);
+                 fetchTradeCompletionRates(selectedAccount);
+                 fetchProfitLossCycles(selectedAccount);
+             }
+
+             // Fetch All Accounts Data
+             function fetchAllAccountsData(accountName) {
+                 fetch(`/all_accounts_data`)
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data.error) {
+                             console.error("Error fetching all accounts data:", data.error);
+                             return;
+                         }
+                         updateAccountCards(data.accounts_data);
+                     })
+                     .catch(error => console.error("Fetch error:", error));
+             }
+
+             // Fetch Trade Goals Data
+             function fetchTradeGoalsData(accountName) {
+                 fetch(`/trade_goals_data/${accountName}`)
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data.error) {
+                             console.error("Error fetching trade goals data:", data.error);
+                             return;
+                         }
+                         updateTradeGoalsProgress(data);
+                     })
+                     .catch(error => console.error("Fetch error:", error));
+             }
+
+             // Fetch Cumulative P&L
+             function fetchCumulativePNL(accountName) {
+                 fetch(`/cumulative_pnl/${accountName}`)
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data.error) {
+                             console.error("Error fetching cumulative P&L:", data.error);
+                             return;
+                         }
+                         renderCumulativePNLChart(data);
+                     })
+                     .catch(error => console.error("Fetch error:", error));
+             }
+
+             // Fetch Trade Completion Rates
+             function fetchTradeCompletionRates(accountName) {
+                 fetch(`/trade_completion_rates/${accountName}`)
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data.error) {
+                             console.error("Error fetching trade completion rates:", data.error);
+                             return;
+                         }
+                         renderCompletionChart(data);
+                     })
+                     .catch(error => console.error("Fetch error:", error));
+             }
+
+             // Fetch Profit/Loss Over Cycles
+             function fetchProfitLossCycles(accountName) {
+                 fetch(`/profit_loss_cycles/${accountName}`)
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data.error) {
+                             console.error("Error fetching profit/loss cycles:", data.error);
+                             return;
+                         }
+                         renderProfitLossChart(data);
+                     })
+                     .catch(error => console.error("Fetch error:", error));
+             }
+
+             // Update Account Cards
+             function updateAccountCards(accounts_data) {
+                 accounts_data.forEach(account => {
+                     // Update Total Profit
+                     const totalProfitElem = document.getElementById(`totalProfit-${account.id}`);
+                     if (totalProfitElem) {
+                         totalProfitElem.textContent = `$${account.total_profit.toFixed(2)}`;
+                     }
+
+                     // Update NY Trade Progress
+                     const nyProgressElem = document.getElementById(`nyProgress-${account.id}`);
+                     if (nyProgressElem) {
+                         const nyProgress = calculateProgress(account.ny_completed_count, account.ny_pending_count);
+                         nyProgressElem.style.width = `${nyProgress}%`;
+                         nyProgressElem.textContent = `${nyProgress.toFixed(1)}%`;
+                     }
+
+                     // Update London Trade Progress
+                     const londonProgressElem = document.getElementById(`londonProgress-${account.id}`);
+                     if (londonProgressElem) {
+                         const londonProgress = calculateProgress(account.london_completed_count, account.london_pending_count);
+                         londonProgressElem.style.width = `${londonProgress}%`;
+                         londonProgressElem.textContent = `${londonProgress.toFixed(1)}%`;
+                     }
+                 });
+             }
+
+             // Calculate Progress Percentage
+             function calculateProgress(completed, pending) {
+                 const total = completed + pending;
+                 return total > 0 ? (completed / total) * 100 : 0;
+             }
+
+             // Update Trade Goals Progress Bars
+             function updateTradeGoalsProgress(data) {
+                 // NY Trade Progress
+                 const nyProgressBar = document.getElementById("nyProgressBar");
+                 if (nyProgressBar) {
+                     nyProgressBar.style.width = `${data.ny_progress.toFixed(1)}%`;
+                     nyProgressBar.textContent = `${data.ny_progress.toFixed(1)}%`;
+                 }
+
+                 // London Trade Progress
+                 const londonProgressBar = document.getElementById("londonProgressBar");
+                 if (londonProgressBar) {
+                     londonProgressBar.style.width = `${data.london_progress.toFixed(1)}%`;
+                     londonProgressBar.textContent = `${data.london_progress.toFixed(1)}%`;
+                 }
+
+                 // Total Profit Progress
+                 const totalProgressBar = document.getElementById("totalProgressBar");
+                 if (totalProgressBar) {
+                     totalProgressBar.style.width = `${data.total_profit_progress.toFixed(1)}%`;
+                     totalProgressBar.textContent = `${data.total_profit_progress.toFixed(1)}%`;
+                 }
+             }
+
+             // Render Cumulative P&L Chart
+             function renderCumulativePNLChart(data) {
+                 const ctx = document.getElementById("pnlChart").getContext("2d");
+
+                 // Destroy existing chart instance if any
+                 if (window.pnlChartInstance) {
+                     window.pnlChartInstance.destroy();
+                 }
+
+                 window.pnlChartInstance = new Chart(ctx, {
+                     type: "bar",
+                     data: {
+                         labels: data.dates,
+                         datasets: [
+                             {
+                                 type: "bar",
+                                 label: "NY Daily Profit",
+                                 data: data.ny_profits,
+                                 backgroundColor: "rgba(75, 192, 192, 0.6)",
+                                 borderColor: "rgba(75, 192, 192, 1)",
+                                 borderWidth: 1,
+                             },
+                             {
+                                 type: "bar",
+                                 label: "London Daily Profit",
+                                 data: data.london_profits,
+                                 backgroundColor: "rgba(153, 102, 255, 0.6)",
+                                 borderColor: "rgba(153, 102, 255, 1)",
+                                 borderWidth: 1,
+                             },
+                             {
+                                 type: "line",
+                                 label: "Cumulative P&L",
+                                 data: data.cumulative_pnl,
+                                 borderColor: "#ff9800",
+                                 borderWidth: 2,
+                                 fill: false,
+                                 tension: 0.1,
+                                 pointRadius: 3,
+                             },
+                         ],
+                     },
+                     options: {
+                         responsive: true,
+                         plugins: {
+                             legend: {
+                                 labels: {
+                                     color: "#e0e0e0",
+                                     font: {
+                                         weight: 'bold'
+                                     }
+                                 },
+                             },
+                             tooltip: {
+                                 mode: 'index',
+                                 intersect: false,
+                                 backgroundColor: '#333333',
+                                 titleColor: '#ffffff',
+                                 bodyColor: '#e0e0e0',
+                                 borderColor: '#4fc3f7',
+                                 borderWidth: 1,
+                             }
+                         },
+                         scales: {
+                             x: {
+                                 ticks: {
+                                     color: "#e0e0e0",
+                                 },
+                                 grid: {
+                                     color: "#333333",
+                                 },
+                             },
+                             y: {
+                                 ticks: {
+                                     color: "#e0e0e0",
+                                 },
+                                 grid: {
+                                     color: "#333333",
+                                 },
+                             },
+                         },
+                     },
+                 });
+             }
+
+             // Render Trade Completion Rates Chart
+             function renderCompletionChart(data) {
+                 const ctx = document.getElementById("completionChart").getContext("2d");
+
+                 // Destroy existing chart instance if any
+                 if (window.completionChartInstance) {
+                     window.completionChartInstance.destroy();
+                 }
+
+                 window.completionChartInstance = new Chart(ctx, {
+                     type: "pie",
+                     data: {
+                         labels: ["NY Completed", "NY Pending", "London Completed", "London Pending"],
+                         datasets: [{
+                             data: [
+                                 data.ny_completed_count,
+                                 data.ny_pending_count,
+                                 data.london_completed_count,
+                                 data.london_pending_count
+                             ],
+                             backgroundColor: [
+                                 "#4caf50", // Green
+                                 "#ffeb3b", // Yellow
+                                 "#2196f3", // Blue
+                                 "#f44336"  // Red
+                             ]
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         plugins: {
+                             legend: {
+                                 labels: {
+                                     color: "#e0e0e0",
+                                 },
+                             },
+                             tooltip: {
+                                 backgroundColor: '#333333',
+                                 titleColor: '#ffffff',
+                                 bodyColor: '#e0e0e0',
+                                 borderColor: '#4fc3f7',
+                                 borderWidth: 1,
+                             }
+                         }
+                     }
+                 });
+             }
+
+             // Render Profit/Loss Over Cycles Chart
+             function renderProfitLossChart(data) {
+                 const ctx = document.getElementById("profitLossChart").getContext("2d");
+
+                 // Destroy existing chart instance if any
+                 if (window.profitLossChartInstance) {
+                     window.profitLossChartInstance.destroy();
+                 }
+
+                 window.profitLossChartInstance = new Chart(ctx, {
+                     type: "line",
+                     data: {
+                         labels: data.cycle_dates,
+                         datasets: [{
+                             label: "Total Profit",
+                             data: data.cycle_profits,
+                             borderColor: "#ff9800",
+                             backgroundColor: "rgba(255, 152, 0, 0.2)",
+                             fill: true,
+                             tension: 0.3,
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         plugins: {
+                             legend: {
+                                 labels: {
+                                     color: "#e0e0e0",
+                                 },
+                             },
+                             tooltip: {
+                                 backgroundColor: '#333333',
+                                 titleColor: '#ffffff',
+                                 bodyColor: '#e0e0e0',
+                                 borderColor: '#4fc3f7',
+                                 borderWidth: 1,
+                             }
+                         },
+                         scales: {
+                             x: {
+                                 ticks: {
+                                     color: "#e0e0e0",
+                                 },
+                                 grid: {
+                                     color: "#333333",
+                                 },
+                             },
+                             y: {
+                                 ticks: {
+                                     color: "#e0e0e0",
+                                 },
+                                 grid: {
+                                     color: "#333333",
+                                 },
+                             },
+                         },
+                     }
+                 });
+             }
+
+             // Event Listeners
+             accountSelect.addEventListener("change", initializeDashboard);
+             refreshBtn.addEventListener("click", initializeDashboard);
+
+             // Initialize Dashboard on Page Load
+             initializeDashboard();
+         });
+
+        /**
+         * Update the dashboard by fetching new data and rendering metrics and charts.
+         */
+        async function updateDashboard() {
+            const account = accountSelect.value;
+            const data = await fetchAccountData(account);
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            updateMetrics(data);
+            renderChart(data);
+
+            // Fetch additional data for completion rates and profit/loss
+            const completionData = await fetch(`/completion_data/${account}`).then(res => res.json());
+            renderCompletionChart(completionData);
+
+            const profitLossData = await fetch(`/profit_loss_data/${account}`).then(res => res.json());
+            renderProfitLossChart(profitLossData);
+
+            // Update Account Cards
+            const selectedAccountId = {{ selected_account.id if selected_account else 'null' }};
+            if (selectedAccountId !== 'null') {
+                updateAccountCards(completionData, selectedAccountId);
+            }
+
+            // Fetch and update all accounts' progress bars
+            const allAccountsData = await fetchAllAccountsData();
+            updateAllAccountsProgressBars(allAccountsData.accounts_data);
+
+            // Update Trade Goals Progress Bars
+            updateTradeGoalsProgress(completionData);
+        }
+
+        // Initial Dashboard Load
+        updateDashboard();
+
+        // Event Listeners
+        refreshBtn.addEventListener("click", updateDashboard);
+        accountSelect.addEventListener("change", updateDashboard);
+
+        // Theme Toggle Logic
+        const themeSwitch = document.getElementById("themeSwitch");
+        const currentTheme = localStorage.getItem("theme") || "dark";
+
+        if (currentTheme === "light") {
+            document.body.classList.add("light-theme");
+            themeSwitch.checked = true;
+        } else {
+            document.body.classList.remove("light-theme");
+            themeSwitch.checked = false;
+        }
+
+        themeSwitch.addEventListener("change", () => {
+            if (themeSwitch.checked) {
+                document.body.classList.add("light-theme");
+                localStorage.setItem("theme", "light");
+            } else {
+                document.body.classList.remove("light-theme");
+                localStorage.setItem("theme", "dark");
+            }
+        });
+    </script>
+</body>
+</html>
